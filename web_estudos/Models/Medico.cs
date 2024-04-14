@@ -5,6 +5,7 @@ using System.Web;
 
 namespace web_estudos.Models
 {
+    //Medico class
     public class Medico
     {
         public string CRM { get; set; }
