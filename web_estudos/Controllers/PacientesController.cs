@@ -73,13 +73,44 @@ namespace web_estudos.Controllers
         }
 
         // POST: api/Pacientes
-        public void Post([FromBody]string value)
+        public IHttpActionResult Post(Models.Paciente paciente)
         {
+            string connectionString = @"server=DESKTOP-FKJDNP8\SQLEXPRESS;Database=consultorioMY;Trusted_Connection = True;";
+            
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                string sql = $"insert into paciente (nome, datanascimento) values ('{paciente.Nome}', " +
+                    $"'{paciente.DataNascimento}'); SELECT convert(int, @@IDENTITY)";
+                using(SqlCommand cmd = new SqlCommand())
+                {
+                    cmd.CommandText = sql;
+                    cmd.Connection = conn;
+                    paciente.Codigo = (int)cmd.ExecuteScalar();
+                }
+            }
+            if (paciente.Codigo == 0)
+                return InternalServerError();
+            else
+                return Content(HttpStatusCode.Created, paciente);
         }
-
         // PUT: api/Pacientes/5
-        public void Put(int id, [FromBody]string value)
+        public IHttpActionResult Put(int id, Models.Paciente paciente)
         {
+            string connectionString = @"server=DESKTOP-FKJDNP8\SQLEXPRESS;Database=consultorioMY;Trusted_Connection = True;";
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                string sql = $"update paciente set nome = '{paciente.Nome}' where codigo = {id};";
+                using (SqlCommand cmd = new SqlCommand())
+                {
+                    cmd.CommandText = sql;
+                    cmd.Connection = conn;
+                    cmd.ExecuteNonQuery();
+
+                }
+            }
+            return Content(HttpStatusCode.OK, paciente);
         }
 
         // DELETE: api/Pacientes/5
