@@ -97,19 +97,26 @@ namespace web_estudos.Controllers
         // PUT: api/Pacientes/5
         public IHttpActionResult Put(int id, Models.Paciente paciente)
         {
+            if (id == paciente.Codigo)
+                return BadRequest("O id da requisição não coincide com o código do paciente");
+
+            int linhasAfetadas;
             string connectionString = @"server=DESKTOP-FKJDNP8\SQLEXPRESS;Database=consultorioMY;Trusted_Connection = True;";
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
-                string sql = $"update paciente set nome = '{paciente.Nome}' where codigo = {id};";
+                string sql = $"update paciente set nome = '{paciente.Nome}', " +
+                $"datanascimento = '{paciente.DataNascimento.ToString("yyyy-MM-dd")}' where codigo = {id};";
                 using (SqlCommand cmd = new SqlCommand())
                 {
                     cmd.CommandText = sql;
                     cmd.Connection = conn;
-                    cmd.ExecuteNonQuery();
-
+                    linhasAfetadas = cmd.ExecuteNonQuery();
                 }
             }
+            if (linhasAfetadas == 0)
+                return NotFound();
+
             return Content(HttpStatusCode.OK, paciente);
         }
 
