@@ -52,6 +52,7 @@ namespace web_estudos.Controllers
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
+
                 string sql = $"select codigo, nome, datanascimento from paciente where codigo = {id};";
                 using (SqlCommand cmd = new SqlCommand())
                 {
@@ -80,12 +81,16 @@ namespace web_estudos.Controllers
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
-                string sql = $"insert into paciente (nome, datanascimento) values ('{paciente.Nome}', " +
-                    $"'{paciente.DataNascimento}'); SELECT convert(int, @@IDENTITY)";
+
                 using(SqlCommand cmd = new SqlCommand())
                 {
-                    cmd.CommandText = sql;
+                    cmd.CommandText = "insert into paciente (nome, datanascimento) values (@nome, " +
+                    "@datanascimento); SELECT convert(int, @@IDENTITY) as codigo";
+                    
                     cmd.Connection = conn;
+                    //SEGURANÇA IMPLEMENTADO NA AULA 30.
+                    cmd.Parameters.Add(new SqlParameter("@nome", System.Data.SqlDbType.VarChar)).Value = paciente.Nome;
+                    cmd.Parameters.Add(new SqlParameter("@datanascimento", System.Data.SqlDbType.VarChar)).Value = paciente.DataNascimento;
                     paciente.Codigo = (int)cmd.ExecuteScalar();
                 }
             }
@@ -104,12 +109,11 @@ namespace web_estudos.Controllers
             string connectionString = @"server=DESKTOP-FKJDNP8\SQLEXPRESS;Database=consultorioMY;Trusted_Connection = True;";
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                conn.Open();
-                string sql = $"update paciente set nome = '{paciente.Nome}', " +
-                $"datanascimento = '{paciente.DataNascimento.ToString("yyyy-MM-dd")}' where codigo = {id};";
+                conn.Open(); 
                 using (SqlCommand cmd = new SqlCommand())
                 {
-                    cmd.CommandText = sql;
+                    cmd.CommandText = $"update paciente set nome = '{paciente.Nome}', " +
+                    $"datanascimento = '{paciente.DataNascimento.ToString("yyyy-MM-dd")}' where codigo = {id};";
                     cmd.Connection = conn;
                     linhasAfetadas = cmd.ExecuteNonQuery();
                 }
