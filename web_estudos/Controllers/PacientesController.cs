@@ -1,28 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Web.Http;
 using System.Data.SqlClient;
+using System.Net;
+using System.Web.Http;
 using web_estudos.Models;
 namespace web_estudos.Controllers
 {
     public class PacientesController : ApiController
     {
+        private readonly string connectionString;
+
+        public PacientesController()
+        {
+            this.connectionString =
+            @"server=DESKTOP-FKJDNP8\SQLEXPRESS;Database=consultorioMY;Trusted_Connection = True;";
+        }
+
         // GET: api/Pacientes
         public List<Models.Paciente> Get()
         {
             List<Models.Paciente> pacientes = new List<Models.Paciente>();
 
-            using (SqlConnection conn = new SqlConnection())
+            using (SqlConnection conn = new SqlConnection(this.connectionString))
             {
-                string connectionString = @"server=DESKTOP-FKJDNP8\SQLEXPRESS;Database=consultorioMY;Trusted_Connection = True;";
-                conn.ConnectionString = connectionString;
                 conn.Open();
-
                 string sql = "select codigo, nome, datanascimento from paciente"; //comando SQL usado
-
                 using (SqlCommand cmd = new SqlCommand())
                 {
                     cmd.CommandText = sql;
@@ -48,11 +50,9 @@ namespace web_estudos.Controllers
         public IHttpActionResult Get(int id)
         {
             Models.Paciente paciente = new Paciente();
-            string connectionString = @"server=DESKTOP-FKJDNP8\SQLEXPRESS;Database=consultorioMY;Trusted_Connection = True;";
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlConnection conn = new SqlConnection(this.connectionString))
             {
                 conn.Open();
-
                 string sql = $"select codigo, nome, datanascimento from paciente where codigo = {id};";
                 using (SqlCommand cmd = new SqlCommand())
                 {
@@ -76,21 +76,17 @@ namespace web_estudos.Controllers
         // POST: api/Pacientes
         public IHttpActionResult Post(Models.Paciente paciente)
         {
-            string connectionString = @"server=DESKTOP-FKJDNP8\SQLEXPRESS;Database=consultorioMY;Trusted_Connection = True;";
-            
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlConnection conn = new SqlConnection(this.connectionString))
             {
                 conn.Open();
-
                 using(SqlCommand cmd = new SqlCommand())
                 {
                     cmd.CommandText = "insert into paciente (nome, datanascimento) values (@nome, " +
-                    "@datanascimento); SELECT convert(int, @@IDENTITY) as codigo";
-                    
+                    "@datanascimento); SELECT convert(int, @@IDENTITY) as codigo"; 
                     cmd.Connection = conn;
                     //SEGURANÇA IMPLEMENTADO NA AULA 30.
                     cmd.Parameters.Add(new SqlParameter("@nome", System.Data.SqlDbType.VarChar)).Value = paciente.Nome;
-                    cmd.Parameters.Add(new SqlParameter("@datanascimento", System.Data.SqlDbType.VarChar)).Value = paciente.DataNascimento;
+                    cmd.Parameters.Add(new SqlParameter("@datanascimento", System.Data.SqlDbType.Date)).Value = paciente.DataNascimento;
                     paciente.Codigo = (int)cmd.ExecuteScalar();
                 }
             }
@@ -106,8 +102,7 @@ namespace web_estudos.Controllers
                 return BadRequest("O id da requisição não coincide com o código do paciente");
 
             int linhasAfetadas;
-            string connectionString = @"server=DESKTOP-FKJDNP8\SQLEXPRESS;Database=consultorioMY;Trusted_Connection = True;";
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlConnection conn = new SqlConnection(this.connectionString))
             {
                 conn.Open(); 
                 using (SqlCommand cmd = new SqlCommand())
@@ -127,11 +122,9 @@ namespace web_estudos.Controllers
         // DELETE: api/Pacientes/5
         public IHttpActionResult Delete(int id)
         {
-            string connectionString = @"server=DESKTOP-FKJDNP8\SQLEXPRESS;Database=consultorioMY;Trusted_Connection = True;";
             int linhas;
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlConnection conn = new SqlConnection(this.connectionString))
             {
-                conn.ConnectionString = connectionString;
                 conn.Open();
                 string sql = $"Delete From paciente where codigo = {id};";
                 using (SqlCommand cmd = new SqlCommand(sql, conn))
