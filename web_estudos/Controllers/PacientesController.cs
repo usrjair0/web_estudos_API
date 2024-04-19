@@ -8,12 +8,11 @@ namespace web_estudos.Controllers
 {
     public class PacientesController : ApiController
     {
-        private readonly string connectionString;
+        private readonly Repositories.SQLServer.Paciente repositorioPaciente;
 
         public PacientesController()
         {
-            this.connectionString =
-            @"server=DESKTOP-FKJDNP8\SQLEXPRESS;Database=consultorioMY;Trusted_Connection = True;";
+            this.repositorioPaciente = new Repositories.SQLServer.Paciente(configurations.DataBase.getConnectionString());
         }
 
         // GET: api/Pacientes

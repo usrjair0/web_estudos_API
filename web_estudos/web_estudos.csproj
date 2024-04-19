@@ -85,6 +85,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="configurations\DataBase.cs" />
     <Compile Include="Controllers\MedicosController.cs" />
     <Compile Include="Controllers\PacientesController.cs" />
     <Compile Include="Global.asax.cs">
@@ -93,6 +94,8 @@
     <Compile Include="Models\Medico.cs" />
     <Compile Include="Models\Paciente.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repositories\SQLServer\Medico.cs" />
+    <Compile Include="Repositories\SQLServer\Paciente.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
